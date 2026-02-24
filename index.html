@@ -244,7 +244,7 @@ body {
         <div class="card-back">
             <div class="letter" id="letter">
                 <div class="title">More than you love me</div>
-                <div class="signature">Rishabh Chugh</div>
+                <div class="signature">Rishabh Chugh<br>(your pookster)</div>
                 <div class="poem">I don’t know when it happened.
 Maybe somewhere between your laugh
 And the way you say my name,
@@ -326,40 +326,44 @@ resetBtn.addEventListener('click', () => {
     setTimeout(() => { card.classList.remove("flipped"); envText.style.opacity = '1'; clickCount = 0; isAnimating = false; }, 2300);
 });
 
-// --- UPDATED PDF LOGIC TO PREVENT CLIPPING ---
+// --- UPDATED PDF GENERATOR ---
 downloadBtn.addEventListener('click', () => {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = "Saving... ⏳";
     
+    // Ghost container for capture
     const printArea = document.createElement('div');
-    printArea.style.position = 'absolute';
-    printArea.style.left = '-9999px';
-    printArea.style.top = '0';
-    document.body.appendChild(printArea);
-
-    // FIXED: Increased right padding (120px) to prevent last name from cutting off
-    const pdfMarkup = `
-        <div id="pdf-container" style="width: 800px; padding: 60px 120px 100px 60px; background-color: white; font-family: 'Dancing Script', cursive;">
-            <div style="font-size: 48px; text-align: center; color: #ff4f8b; margin-bottom: 10px;">More than you love me</div>
-            <div style="text-align: right; font-size: 28px; color: #ff4f8b; margin-bottom: 50px;">Rishabh Chugh</div>
-            <div style="font-size: 24px; line-height: 1.6; color: #444; white-space: pre-line;">${document.querySelector('.poem').innerText}</div>
-        </div>
+    printArea.style.cssText = `
+        width: 800px;
+        padding: 60px 80px 80px 60px;
+        background-color: white;
+        font-family: 'Dancing Script', cursive;
+        color: #444;
+        box-sizing: border-box;
     `;
-    printArea.innerHTML = pdfMarkup;
 
-    const container = printArea.querySelector('#pdf-container');
+    // Preserving breaks with white-space: pre-wrap and ensuring name visibility
+    printArea.innerHTML = `
+        <div style="font-size: 42px; text-align: center; color: #ff4f8b; margin-bottom: 10px; font-weight: bold;">More than you love me</div>
+        <div style="font-size: 24px; text-align: right; color: #ff4f8b; margin-bottom: 40px; line-height: 1.2;">Rishabh Chugh<br>(your pookster)</div>
+        <div style="font-size: 20px; line-height: 1.5; text-align: left; white-space: pre-wrap;">${document.querySelector('.poem').innerText}</div>
+    `;
+    
+    const ghost = document.createElement('div');
+    ghost.style.cssText = "position: absolute; left: -9999px; top: 0;";
+    ghost.appendChild(printArea);
+    document.body.appendChild(ghost);
 
     const opt = {
         margin: 0,
         filename: 'For_Shruti.pdf',
         image: { type: 'jpeg', quality: 1 },
-        // FIXED: windowHeight forces capture of the full scrollable height
-        html2canvas: { scale: 2, useCORS: true, windowHeight: container.scrollHeight },
-        jsPDF: { unit: 'px', format: [800, container.scrollHeight + 100], orientation: 'portrait' }
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'px', format: [800, printArea.offsetHeight + 100], orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(container).save().then(() => {
-        document.body.removeChild(printArea);
+    html2pdf().set(opt).from(printArea).save().then(() => {
+        document.body.removeChild(ghost);
         downloadBtn.innerHTML = originalText;
     });
 });
