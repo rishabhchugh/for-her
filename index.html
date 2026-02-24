@@ -244,7 +244,7 @@ body {
         <div class="card-back">
             <div class="letter" id="letter">
                 <div class="title">More than you love me</div>
-                <div class="signature">Rishabh Chugh<br>(your pookster)</div>
+                <div class="signature">Rishabh Chugh</div>
                 <div class="poem">I don’t know when it happened.
 Maybe somewhere between your laugh
 And the way you say my name,
@@ -326,15 +326,51 @@ resetBtn.addEventListener('click', () => {
     setTimeout(() => { card.classList.remove("flipped"); envText.style.opacity = '1'; clickCount = 0; isAnimating = false; }, 2300);
 });
 
-// --- UPDATED PDF GENERATOR ---
+// --- UPDATED STRING-BASED PDF GENERATOR ---
 downloadBtn.addEventListener('click', () => {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = "Saving... ⏳";
     
-    // Ghost container for capture
+    const poemContent = `More than you love me
+
+Rishabh Chugh
+(your pookster)
+
+I don’t know when it happened.
+Maybe somewhere between your laugh
+And the way you say my name,
+You became my favorite thought.
+
+You’re my peace in a storm,
+The softness in my sharp edges,
+Your touch makes my heart go warm,
+You reshaped my whole world with the softest sketches
+
+From taking off your earrings,
+To soft kisses on your neck,
+You are the answer to all my yearnings,
+The answer to my prayers, one I’d never expect
+
+But baby, one thing I wanna say to you,
+The three magic words that make me
+The happiest man on earth, my boo,
+You’re my every fantasy,
+All I wanna say to you,
+I love you, I love you, I love you,
+But more than you love me
+
+And now that you know I do,
+I guess theres just one thing left to do,
+Write you a poem you can brag about,
+To your friends and peers, as I brag about you,
+But I will still say this baby,
+I love you, I love you, I love you,
+But more than you love me`;
+
     const printArea = document.createElement('div');
+    // Using box-sizing to keep formatting exact and adding padding-right so name doesn't clip
     printArea.style.cssText = `
-        width: 800px;
+        width: 750px;
         padding: 60px 80px 80px 60px;
         background-color: white;
         font-family: 'Dancing Script', cursive;
@@ -342,29 +378,50 @@ downloadBtn.addEventListener('click', () => {
         box-sizing: border-box;
     `;
 
-    // Preserving breaks with white-space: pre-wrap and ensuring name visibility
-    printArea.innerHTML = `
-        <div style="font-size: 42px; text-align: center; color: #ff4f8b; margin-bottom: 10px; font-weight: bold;">More than you love me</div>
-        <div style="font-size: 24px; text-align: right; color: #ff4f8b; margin-bottom: 40px; line-height: 1.2;">Rishabh Chugh<br>(your pookster)</div>
-        <div style="font-size: 20px; line-height: 1.5; text-align: left; white-space: pre-wrap;">${document.querySelector('.poem').innerText}</div>
-    `;
+    const lines = poemContent.split('\n');
+    let html = "";
+    
+    lines.forEach((line, index) => {
+        if (index === 0) {
+            // Title
+            html += `<div style="font-size: 40px; text-align: center; color: #ff4f8b; margin-bottom: 10px; font-weight: bold;">${line}</div>`;
+        } else if (index === 2) {
+            // Rishabh Chugh (Moved slightly to the left with padding-right)
+            html += `<div style="font-size: 24px; text-align: right; color: #ff4f8b; padding-right: 30px;">${line}</div>`;
+        } else if (index === 3) {
+            // (your pookster)
+            html += `<div style="font-size: 24px; text-align: right; color: #ff4f8b; margin-bottom: 40px; padding-right: 30px;">${line}</div>`;
+        } else if (line.trim() === "") {
+            // Spacing for empty lines
+            html += `<div style="height: 22px;"></div>`;
+        } else if (index > 3) {
+            // Scaled down font size just slightly to guarantee the last line fits
+            html += `<div style="font-size: 22px; line-height: 1.4; text-align: left; margin-bottom: 2px;">${line}</div>`;
+        }
+    });
+
+    printArea.innerHTML = html;
     
     const ghost = document.createElement('div');
     ghost.style.cssText = "position: absolute; left: -9999px; top: 0;";
     ghost.appendChild(printArea);
     document.body.appendChild(ghost);
 
-    const opt = {
-        margin: 0,
-        filename: 'For_Shruti.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'px', format: [800, printArea.offsetHeight + 100], orientation: 'portrait' }
-    };
+    // Wait for the custom font to load so we can accurately measure the height and prevent bottom cutoff!
+    document.fonts.ready.then(() => {
+        const opt = {
+            margin: 0,
+            filename: 'For_Shruti.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true },
+            // Added 150px safety buffer to the height so it never slices the bottom line
+            jsPDF: { unit: 'px', format: [750, printArea.offsetHeight + 150], orientation: 'portrait' }
+        };
 
-    html2pdf().set(opt).from(printArea).save().then(() => {
-        document.body.removeChild(ghost);
-        downloadBtn.innerHTML = originalText;
+        html2pdf().set(opt).from(printArea).save().then(() => {
+            document.body.removeChild(ghost);
+            downloadBtn.innerHTML = originalText;
+        });
     });
 });
 
