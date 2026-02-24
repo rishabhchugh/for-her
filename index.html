@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Shruti ❤️</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #ffeef5);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Container */
+.container {
+    perspective: 1000px;
+    z-index: 10;
+}
+
+/* Main Card Wrapper */
+.card {
+    width: 280px;
+    height: 180px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.4, 0.2, 0.2, 1);
+    cursor: pointer;
+}
+
+/* Flipped state */
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+/* Shared Card Face Styling */
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* Front of the card */
+.card-front {
+    background: #ff8fb1;
+    z-index: 2;
+    padding: 15px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+}
+
+.card-front span {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-top: 10px;
+    display: block;
+}
+
+/* Back of the card (Envelope) */
+.card-back {
+    background: #f48fb1;
+    transform: rotateY(180deg);
+}
+
+/* Envelope Flap */
+.flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 140px solid transparent;
+    border-right: 140px solid transparent;
+    border-top: 100px solid #ff6f9c;
+    transform-origin: top;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 4;
+}
+
+/* Flap open */
+.flap.open { 
+    transform: rotateX(180deg); 
+    z-index: 1; 
+}
+
+/* Envelope Pocket */
+.pocket {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 140px solid #ffa0bc;
+    border-right: 140px solid #ffa0bc;
+    border-bottom: 110px solid #ff8fb1;
+    border-top: 70px solid transparent;
+    z-index: 3;
+}
+
+/* Envelope click text */
+.envelope-text {
+    position: absolute;
+    bottom: 25px;
+    z-index: 5;
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
+
+/* --- THE LETTER & UNFOLD ANIMATION --- */
+.letter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(15px);
+    width: 240px;
+    height: 120px; 
+    background-color: white;
+    /* Increased heart opacity from 0.08 to 0.18 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.12' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+    background-size: 30px 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 2; 
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    padding: 20px;
+    padding-bottom: 40px; 
+    box-sizing: border-box;
+    cursor: default;
+}
+
+/* State 1: Slides up out of the pocket */
+.letter.slide-out {
+    transform: translate(-50%, -50%) translateY(-120px);
+}
+
+/* State 2: Expands and unfolds over the screen */
+.letter.unfold {
+    transform: translate(-50%, -50%) translateY(0);
+    width: 90vw;
+    max-width: 420px;
+    height: 80vh; 
+    border-radius: 15px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+/* Poem internal formatting */
+.title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 28px;
+    text-align: center;
+    color: #ff4f8b;
+    margin-bottom: 8px;
+}
+
+.signature {
+    text-align: right;
+    font-family: 'Dancing Script', cursive;
+    font-size: 20px;
+    color: #ff4f8b;
+    margin-bottom: 15px;
+}
+
+.poem {
+    font-family: 'Dancing Script', cursive;
+    font-size: 20px;
+    color: #444;
+    white-space: pre-line;
+}
+
+/* Action Buttons Group */
+.action-buttons {
+    position: fixed;
+    bottom: 3vh;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    display: flex;
+    gap: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s ease;
+    z-index: 50;
+}
+
+.action-buttons.show-btns {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.action-btn {
+    background: #ff4f8b;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    border-radius: 25px;
+    box-shadow: 0 5px 15px rgba(255, 79, 139, 0.4);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.2s;
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px){
+    .card { width: 230px; height: 150px; }
+    .flap { border-left: 115px solid transparent; border-right: 115px solid transparent; border-top: 85px solid #ff6f9c; }
+    .pocket { border-left: 115px solid #ffa0bc; border-right: 115px solid #ffa0bc; border-bottom: 90px solid #ff8fb1; border-top: 60px solid transparent; }
+    
+    .letter { width: 200px; padding: 15px; padding-bottom: 50px; }
+    .title { font-size: 24px; }
+    .signature { font-size: 18px; margin-bottom: 10px; }
+    .poem { font-size: 17px; }
+    .letter.unfold { height: 65vh; }
+    
+    .action-buttons { bottom: 5vh; gap: 10px; }
+    .action-btn { padding: 10px 15px; font-size: 14px; }
+}
+
+/* Petals animation */
+.petal {
+    position: absolute;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: fall linear infinite;
+    z-index: 0;
+}
+
+@keyframes fall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card" id="card">
+        <div class="card-front">
+            For Shruti, my perfect princess 💖
+            <span>click on me →</span>
+        </div>
+        
+        <div class="card-back">
+            <div class="letter" id="letter">
+                <div class="title">More than you love me</div>
+                <div class="signature">Rishabh Chugh</div>
+                <div class="poem">
+I don’t know when it happened.
+Maybe somewhere between your laugh
+And the way you say my name,
+You became my favorite thought.
+
+You’re my peace in a storm,
+The softness in my sharp edges,
+Your touch makes my heart go warm,
+You reshaped my whole world with the softest sketches
+
+From taking off your earrings,
+To soft kisses on your neck,
+You are the answer to all my yearnings,
+The answer to my prayers, one I’d never expect
+
+But baby, one thing I wanna say to you,
+The three magic words that make me
+The happiest man on earth, my boo,
+You’re my every fantasy,
+All I wanna say to you,
+I love you, I love you, I love you,
+But more than you love me
+
+And now that you know I do,
+I guess theres just one thing left to do,
+Write you a poem you can brag about,
+To your friends and peers, as I brag about you,
+But I will still say this baby,
+I love you, I love you, I love you,
+But more than you love me
+                </div>
+            </div>
+
+            <div class="flap" id="flap"></div>
+            <div class="pocket"></div>
+            <div class="envelope-text" id="env-text">click on me ↓</div>
+        </div>
+    </div>
+</div>
+
+<div class="action-buttons" id="action-buttons">
+    <button class="action-btn" id="reset-btn">Read Again 💌</button>
+    <button class="action-btn" id="download-btn">Save PDF 📥</button>
+</div>
+
+<script>
+let clickCount = 0;
+let isAnimating = false;
+const card = document.getElementById("card");
+const flap = document.getElementById("flap");
+const letter = document.getElementById("letter");
+const envText = document.getElementById("env-text");
+const actionButtons = document.getElementById("action-buttons");
+const resetBtn = document.getElementById("reset-btn");
+const downloadBtn = document.getElementById("download-btn");
+
+// Forward Animation (Opening the letter)
+card.addEventListener('click', () => {
+    if(isAnimating) return; 
+
+    clickCount++;
+    
+    if(clickCount === 1){
+        card.classList.add("flipped");
+    } else if(clickCount === 2){
+        isAnimating = true;
+        envText.style.opacity = '0'; 
+        flap.classList.add("open"); 
+        
+        setTimeout(() => {
+            letter.classList.add("slide-out");
+        }, 500); 
+
+        setTimeout(() => {
+            letter.style.zIndex = "10"; 
+            letter.classList.add("unfold");
+        }, 1300);
+
+        setTimeout(() => {
+            letter.style.overflowY = "auto";
+            actionButtons.classList.add("show-btns"); 
+            isAnimating = false; 
+        }, 2100);
+    }
+});
+
+// Rewind Animation (Resetting the letter)
+resetBtn.addEventListener('click', () => {
+    if(isAnimating) return;
+    isAnimating = true;
+
+    actionButtons.classList.remove("show-btns");
+    letter.style.overflowY = "hidden";
+    letter.scrollTo({ top: 0, behavior: 'smooth' }); 
+
+    setTimeout(() => {
+        letter.classList.remove("unfold");
+    }, 300);
+
+    setTimeout(() => {
+        letter.classList.remove("slide-out");
+        letter.style.zIndex = "2"; 
+    }, 1100);
+
+    setTimeout(() => {
+        flap.classList.remove("open");
+    }, 1600);
+
+    setTimeout(() => {
+        card.classList.remove("flipped");
+        envText.style.opacity = '1';
+        clickCount = 0;
+        isAnimating = false;
+    }, 2300);
+});
+
+// Download PDF Logic
+downloadBtn.addEventListener('click', () => {
+    const originalText = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = "Saving... ⏳";
+    
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'fixed';
+    wrapper.style.top = '0';
+    wrapper.style.left = '0';
+    wrapper.style.width = '100vw';
+    wrapper.style.height = '100vh';
+    wrapper.style.zIndex = '1'; 
+    wrapper.style.pointerEvents = 'none';
+    wrapper.style.overflow = 'hidden'; 
+    
+    const pdfContent = document.createElement('div');
+    pdfContent.style.width = '700px'; 
+    pdfContent.style.padding = '40px';
+    pdfContent.style.boxSizing = 'border-box';
+    pdfContent.style.backgroundColor = 'white';
+    pdfContent.style.color = '#444';
+    
+    // Increased heart opacity from 0.08 to 0.18 for the PDF engine as well
+    pdfContent.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.18' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`;
+    pdfContent.style.backgroundSize = '30px 30px';
+    
+    pdfContent.innerHTML = `
+        <div style="font-family: 'Dancing Script', cursive; font-size: 34px; text-align: center; color: #ff4f8b; margin-top: 10px; margin-bottom: 10px;">More than you love me</div>
+        <div style="text-align: right; font-family: 'Dancing Script', cursive; font-size: 20px; color: #ff4f8b; margin-bottom: 20px;">Rishabh Chugh</div>
+        <div style="font-family: 'Dancing Script', cursive; font-size: 16px; white-space: pre-line; line-height: 1.6; padding: 0 20px;">${document.querySelector('.poem').innerHTML.trim()}</div>
+    `;
+
+    wrapper.appendChild(pdfContent);
+    document.body.appendChild(wrapper);
+
+    const opt = {
+        margin:       0.4, 
+        filename:     'For_Shruti.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(pdfContent).save().then(() => {
+        document.body.removeChild(wrapper);
+        downloadBtn.innerHTML = originalText;
+    });
+});
+
+// Safe Petals animation
+function createPetal(){
+    const petal = document.createElement("div");
+    petal.classList.add("petal");
+    petal.innerHTML = "🌸"; 
+    petal.style.left = Math.random() * 100 + "vw";
+    petal.style.animationDuration = (4 + Math.random() * 3) + "s";
+    petal.style.fontSize = (10 + Math.random() * 15) + "px";
+    document.body.appendChild(petal);
+    
+    setTimeout(() => petal.remove(), 7000);
+}
+setInterval(createPetal, 300);
+</script>
+</body>
+</html>
