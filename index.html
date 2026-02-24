@@ -326,7 +326,7 @@ resetBtn.addEventListener('click', () => {
     setTimeout(() => { card.classList.remove("flipped"); envText.style.opacity = '1'; clickCount = 0; isAnimating = false; }, 2300);
 });
 
-// --- UPDATED STRING-BASED PDF GENERATOR ---
+// --- STRING-BASED PDF GENERATOR ---
 downloadBtn.addEventListener('click', () => {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = "Saving... ⏳";
@@ -368,11 +368,13 @@ I love you, I love you, I love you,
 But more than you love me`;
 
     const printArea = document.createElement('div');
-    // Using box-sizing to keep formatting exact and adding padding-right so name doesn't clip
+    // Using exact same styling, just added the hearts back in!
     printArea.style.cssText = `
         width: 750px;
         padding: 60px 80px 80px 60px;
         background-color: white;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.08' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+        background-size: 30px 30px;
         font-family: 'Dancing Script', cursive;
         color: #444;
         box-sizing: border-box;
@@ -383,19 +385,14 @@ But more than you love me`;
     
     lines.forEach((line, index) => {
         if (index === 0) {
-            // Title
             html += `<div style="font-size: 40px; text-align: center; color: #ff4f8b; margin-bottom: 10px; font-weight: bold;">${line}</div>`;
         } else if (index === 2) {
-            // Rishabh Chugh (Moved slightly to the left with padding-right)
             html += `<div style="font-size: 24px; text-align: right; color: #ff4f8b; padding-right: 30px;">${line}</div>`;
         } else if (index === 3) {
-            // (your pookster)
             html += `<div style="font-size: 24px; text-align: right; color: #ff4f8b; margin-bottom: 40px; padding-right: 30px;">${line}</div>`;
         } else if (line.trim() === "") {
-            // Spacing for empty lines
             html += `<div style="height: 22px;"></div>`;
         } else if (index > 3) {
-            // Scaled down font size just slightly to guarantee the last line fits
             html += `<div style="font-size: 22px; line-height: 1.4; text-align: left; margin-bottom: 2px;">${line}</div>`;
         }
     });
@@ -407,14 +404,12 @@ But more than you love me`;
     ghost.appendChild(printArea);
     document.body.appendChild(ghost);
 
-    // Wait for the custom font to load so we can accurately measure the height and prevent bottom cutoff!
     document.fonts.ready.then(() => {
         const opt = {
             margin: 0,
             filename: 'For_Shruti.pdf',
             image: { type: 'jpeg', quality: 1 },
             html2canvas: { scale: 2, useCORS: true },
-            // Added 150px safety buffer to the height so it never slices the bottom line
             jsPDF: { unit: 'px', format: [750, printArea.offsetHeight + 150], orientation: 'portrait' }
         };
 
