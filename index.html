@@ -22,13 +22,11 @@ body {
     position: relative;
 }
 
-/* Container */
 .container {
     perspective: 1000px;
     z-index: 10;
 }
 
-/* Main Card Wrapper */
 .card {
     width: 280px;
     height: 180px;
@@ -38,12 +36,10 @@ body {
     cursor: pointer;
 }
 
-/* Flipped state */
 .card.flipped {
     transform: rotateY(180deg);
 }
 
-/* Shared Card Face Styling */
 .card-front, .card-back {
     position: absolute;
     width: 100%;
@@ -58,7 +54,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Front of the card */
 .card-front {
     background: #ff8fb1;
     z-index: 2;
@@ -75,13 +70,11 @@ body {
     display: block;
 }
 
-/* Back of the card (Envelope) */
 .card-back {
     background: #f48fb1;
     transform: rotateY(180deg);
 }
 
-/* Envelope Flap */
 .flap {
     position: absolute;
     top: 0;
@@ -96,13 +89,11 @@ body {
     z-index: 4;
 }
 
-/* Flap open */
 .flap.open { 
     transform: rotateX(180deg); 
     z-index: 1; 
 }
 
-/* Envelope Pocket */
 .pocket {
     position: absolute;
     bottom: 0;
@@ -116,7 +107,6 @@ body {
     z-index: 3;
 }
 
-/* Envelope click text */
 .envelope-text {
     position: absolute;
     bottom: 25px;
@@ -128,7 +118,6 @@ body {
     transition: opacity 0.3s ease;
 }
 
-/* --- THE LETTER & UNFOLD ANIMATION --- */
 .letter {
     position: absolute;
     top: 50%;
@@ -150,12 +139,10 @@ body {
     cursor: default;
 }
 
-/* State 1: Slides up out of the pocket */
 .letter.slide-out {
     transform: translate(-50%, -50%) translateY(-120px);
 }
 
-/* State 2: Expands and unfolds over the screen */
 .letter.unfold {
     transform: translate(-50%, -50%) translateY(-5vh); 
     width: 90vw;
@@ -165,7 +152,6 @@ body {
     box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
 
-/* Poem internal formatting */
 .title {
     font-family: 'Dancing Script', cursive;
     font-size: 28px;
@@ -187,9 +173,9 @@ body {
     font-size: 20px;
     color: #444;
     white-space: pre-line;
+    padding-bottom: 60px; /* FIXED: Keeps text from being hidden behind buttons */
 }
 
-/* Action Buttons Group */
 .action-buttons {
     position: fixed;
     bottom: 6vh; 
@@ -223,31 +209,16 @@ body {
     transition: transform 0.2s;
 }
 
-.action-btn:active {
-    transform: scale(0.95);
-}
-
-/* Mobile Responsiveness */
 @media (max-width: 480px){
     .card { width: 230px; height: 150px; }
     .flap { border-left: 115px solid transparent; border-right: 115px solid transparent; border-top: 85px solid #ff6f9c; }
     .pocket { border-left: 115px solid #ffa0bc; border-right: 115px solid #ffa0bc; border-bottom: 90px solid #ff8fb1; border-top: 60px solid transparent; }
-    
-    .letter { width: 200px; padding: 15px; padding-bottom: 30px; }
-    .title { font-size: 24px; }
-    .signature { font-size: 18px; margin-bottom: 10px; }
-    .poem { font-size: 17px; }
-    
-    .letter.unfold { 
-        height: 55vh; 
-        transform: translate(-50%, -50%) translateY(-5vh);
-    }
-    
+    .letter { width: 200px; padding: 15px; }
+    .letter.unfold { height: 55vh; transform: translate(-50%, -50%) translateY(-5vh); }
     .action-buttons { bottom: 8vh; gap: 10px; }
     .action-btn { padding: 10px 15px; font-size: 14px; }
 }
 
-/* Petals animation */
 .petal {
     position: absolute;
     opacity: 0.8;
@@ -270,13 +241,11 @@ body {
             For Shruti, my perfect princess 💖
             <span>click on me →</span>
         </div>
-        
         <div class="card-back">
             <div class="letter" id="letter">
                 <div class="title">More than you love me</div>
                 <div class="signature">Rishabh Chugh</div>
-                <div class="poem">
-I don’t know when it happened.
+                <div class="poem">I don’t know when it happened.
 Maybe somewhere between your laugh
 And the way you say my name,
 You became my favorite thought.
@@ -305,10 +274,8 @@ Write you a poem you can brag about,
 To your friends and peers, as I brag about you,
 But I will still say this baby,
 I love you, I love you, I love you,
-But more than you love me
-                </div>
+But more than you love me</div>
             </div>
-
             <div class="flap" id="flap"></div>
             <div class="pocket"></div>
             <div class="envelope-text" id="env-text">click on me ↓</div>
@@ -334,114 +301,69 @@ const downloadBtn = document.getElementById("download-btn");
 
 card.addEventListener('click', () => {
     if(isAnimating) return; 
-
     clickCount++;
-    
     if(clickCount === 1){
         card.classList.add("flipped");
     } else if(clickCount === 2){
         isAnimating = true;
         envText.style.opacity = '0'; 
         flap.classList.add("open"); 
-        
-        setTimeout(() => {
-            letter.classList.add("slide-out");
-        }, 500); 
-
-        setTimeout(() => {
-            letter.style.zIndex = "10"; 
-            letter.classList.add("unfold");
-        }, 1300);
-
-        setTimeout(() => {
-            letter.style.overflowY = "auto";
-            actionButtons.classList.add("show-btns"); 
-            isAnimating = false; 
-        }, 2100);
+        setTimeout(() => { letter.classList.add("slide-out"); }, 500); 
+        setTimeout(() => { letter.style.zIndex = "10"; letter.classList.add("unfold"); }, 1300);
+        setTimeout(() => { letter.style.overflowY = "auto"; actionButtons.classList.add("show-btns"); isAnimating = false; }, 2100);
     }
 });
 
 resetBtn.addEventListener('click', () => {
     if(isAnimating) return;
     isAnimating = true;
-
     actionButtons.classList.remove("show-btns");
     letter.style.overflowY = "hidden";
     letter.scrollTo({ top: 0, behavior: 'smooth' }); 
-
-    setTimeout(() => {
-        letter.classList.remove("unfold");
-    }, 300);
-
-    setTimeout(() => {
-        letter.classList.remove("slide-out");
-        letter.style.zIndex = "2"; 
-    }, 1100);
-
-    setTimeout(() => {
-        flap.classList.remove("open");
-    }, 1600);
-
-    setTimeout(() => {
-        card.classList.remove("flipped");
-        envText.style.opacity = '1';
-        clickCount = 0;
-        isAnimating = false;
-    }, 2300);
+    setTimeout(() => { letter.classList.remove("unfold"); }, 300);
+    setTimeout(() => { letter.classList.remove("slide-out"); letter.style.zIndex = "2"; }, 1100);
+    setTimeout(() => { flap.classList.remove("open"); }, 1600);
+    setTimeout(() => { card.classList.remove("flipped"); envText.style.opacity = '1'; clickCount = 0; isAnimating = false; }, 2300);
 });
 
-// --- FINAL FIXED PDF LOGIC ---
+// --- MOBILE-OPTIMIZED PDF LOGIC ---
 downloadBtn.addEventListener('click', () => {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = "Saving... ⏳";
     
-    // We build a temporary container that isn't hidden by "overflow:hidden"
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '-9999px';
-    tempContainer.style.top = '0';
-    document.body.appendChild(tempContainer);
+    // Hidden container for PDF capture
+    const printArea = document.createElement('div');
+    printArea.style.position = 'absolute';
+    printArea.style.left = '-9999px';
+    printArea.style.top = '0';
+    document.body.appendChild(printArea);
 
     const heartSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.08' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E";
 
-    // Creating a dedicated PDF element with the font and background explicitly set
-    const pdfElement = document.createElement('div');
-    pdfElement.style.width = '800px';
-    pdfElement.style.backgroundColor = 'white';
-    pdfContent = `
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&display=swap');
-            .pdf-body {
-                padding: 80px;
-                background-image: url("${heartSvg}");
-                background-size: 40px 40px;
-                font-family: 'Dancing Script', cursive;
-            }
-        </style>
-        <div class="pdf-body">
-            <div style="font-size: 48px; text-align: center; color: #ff4f8b; margin-bottom: 10px;">More than you love me</div>
-            <div style="text-align: right; font-size: 28px; color: #ff4f8b; margin-bottom: 40px;">Rishabh Chugh</div>
+    // Re-typing the poem specifically for the PDF to ensure spacing and formatting
+    const pdfMarkup = `
+        <div style="width: 700px; padding: 60px; background-color: white; background-image: url('${heartSvg}'); background-size: 40px 40px; font-family: 'Dancing Script', cursive;">
+            <div style="font-size: 44px; text-align: center; color: #ff4f8b; margin-bottom: 10px;">More than you love me</div>
+            <div style="text-align: right; font-size: 26px; color: #ff4f8b; margin-bottom: 40px;">Rishabh Chugh</div>
             <div style="font-size: 24px; line-height: 1.6; color: #444; white-space: pre-line;">${document.querySelector('.poem').innerText}</div>
         </div>
     `;
-    pdfElement.innerHTML = pdfContent;
-    tempContainer.appendChild(pdfElement);
+    printArea.innerHTML = pdfMarkup;
 
     const opt = {
-        margin:       0,
-        filename:     'For_Shruti.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
-        jsPDF:        { unit: 'px', format: [800, pdfElement.offsetHeight], orientation: 'portrait' }
+        margin: 0,
+        filename: 'For_Shruti.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'px', format: [700, printArea.offsetHeight], orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(pdfElement).save().then(() => {
-        document.body.removeChild(tempContainer);
+    html2pdf().set(opt).from(printArea).save().then(() => {
+        document.body.removeChild(printArea);
         downloadBtn.innerHTML = originalText;
     });
 });
 
-// Safe Petals animation
 function createPetal(){
     const petal = document.createElement("div");
     petal.classList.add("petal");
@@ -450,7 +372,6 @@ function createPetal(){
     petal.style.animationDuration = (4 + Math.random() * 3) + "s";
     petal.style.fontSize = (10 + Math.random() * 15) + "px";
     document.body.appendChild(petal);
-    
     setTimeout(() => petal.remove(), 7000);
 }
 setInterval(createPetal, 300);
