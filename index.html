@@ -137,8 +137,7 @@ body {
     width: 240px;
     height: 120px; 
     background-color: white;
-    /* Increased heart opacity from 0.08 to 0.18 */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.12' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.08' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
     background-size: 30px 30px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -146,7 +145,7 @@ body {
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     padding: 20px;
-    padding-bottom: 40px; 
+    padding-bottom: 30px; 
     box-sizing: border-box;
     cursor: default;
 }
@@ -158,10 +157,11 @@ body {
 
 /* State 2: Expands and unfolds over the screen */
 .letter.unfold {
-    transform: translate(-50%, -50%) translateY(0);
+    /* Lifted slightly above true center so it clears the buttons */
+    transform: translate(-50%, -50%) translateY(-5vh); 
     width: 90vw;
     max-width: 420px;
-    height: 80vh; 
+    height: 65vh; 
     border-radius: 15px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
@@ -193,7 +193,7 @@ body {
 /* Action Buttons Group */
 .action-buttons {
     position: fixed;
-    bottom: 3vh;
+    bottom: 6vh; /* Safely spaced away from the letter */
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     display: flex;
@@ -234,13 +234,17 @@ body {
     .flap { border-left: 115px solid transparent; border-right: 115px solid transparent; border-top: 85px solid #ff6f9c; }
     .pocket { border-left: 115px solid #ffa0bc; border-right: 115px solid #ffa0bc; border-bottom: 90px solid #ff8fb1; border-top: 60px solid transparent; }
     
-    .letter { width: 200px; padding: 15px; padding-bottom: 50px; }
+    .letter { width: 200px; padding: 15px; padding-bottom: 30px; }
     .title { font-size: 24px; }
     .signature { font-size: 18px; margin-bottom: 10px; }
     .poem { font-size: 17px; }
-    .letter.unfold { height: 65vh; }
     
-    .action-buttons { bottom: 5vh; gap: 10px; }
+    .letter.unfold { 
+        height: 55vh; /* Reduced height to perfectly center it above buttons */
+        transform: translate(-50%, -50%) translateY(-5vh);
+    }
+    
+    .action-buttons { bottom: 8vh; gap: 10px; }
     .action-btn { padding: 10px 15px; font-size: 14px; }
 }
 
@@ -394,6 +398,7 @@ downloadBtn.addEventListener('click', () => {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = "Saving... ⏳";
     
+    // 1. Create a hidden wrapper for the PDF canvas
     const wrapper = document.createElement('div');
     wrapper.style.position = 'fixed';
     wrapper.style.top = '0';
@@ -404,32 +409,53 @@ downloadBtn.addEventListener('click', () => {
     wrapper.style.pointerEvents = 'none';
     wrapper.style.overflow = 'hidden'; 
     
+    // 2. Full bleed background layer (Allows hearts to go perfectly edge-to-edge)
     const pdfContent = document.createElement('div');
-    pdfContent.style.width = '700px'; 
-    pdfContent.style.padding = '40px';
-    pdfContent.style.boxSizing = 'border-box';
+    pdfContent.style.width = '800px'; 
+    // We do NOT set a height, allowing it to stretch to 2 pages naturally
     pdfContent.style.backgroundColor = 'white';
-    pdfContent.style.color = '#444';
+    pdfContent.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.12' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`;
+    pdfContent.style.backgroundSize = '40px 40px';
     
-    // Increased heart opacity from 0.08 to 0.18 for the PDF engine as well
-    pdfContent.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.18' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`;
-    pdfContent.style.backgroundSize = '30px 30px';
+    // 3. Inner layer for the text padding so it doesn't touch the paper edge
+    const innerContent = document.createElement('div');
+    innerContent.style.padding = '80px'; 
+    innerContent.style.boxSizing = 'border-box';
+    innerContent.style.minHeight = '1056px'; // Ensures the background hearts cover at least 1 full page
     
-    pdfContent.innerHTML = `
-        <div style="font-family: 'Dancing Script', cursive; font-size: 34px; text-align: center; color: #ff4f8b; margin-top: 10px; margin-bottom: 10px;">More than you love me</div>
-        <div style="text-align: right; font-family: 'Dancing Script', cursive; font-size: 20px; color: #ff4f8b; margin-bottom: 20px;">Rishabh Chugh</div>
-        <div style="font-family: 'Dancing Script', cursive; font-size: 16px; white-space: pre-line; line-height: 1.6; padding: 0 20px;">${document.querySelector('.poem').innerHTML.trim()}</div>
+    // 4. Stanzas safely isolated so they NEVER break in half
+    const poemStanzas = [
+        "I don’t know when it happened.<br>Maybe somewhere between your laugh<br>And the way you say my name,<br>You became my favorite thought.",
+        "You’re my peace in a storm,<br>The softness in my sharp edges,<br>Your touch makes my heart go warm,<br>You reshaped my whole world with the softest sketches",
+        "From taking off your earrings,<br>To soft kisses on your neck,<br>You are the answer to all my yearnings,<br>The answer to my prayers, one I’d never expect",
+        "But baby, one thing I wanna say to you,<br>The three magic words that make me<br>The happiest man on earth, my boo,<br>You’re my every fantasy,<br>All I wanna say to you,<br>I love you, I love you, I love you,<br>But more than you love me",
+        "And now that you know I do,<br>I guess theres just one thing left to do,<br>Write you a poem you can brag about,<br>To your friends and peers, as I brag about you,<br>But I will still say this baby,<br>I love you, I love you, I love you,<br>But more than you love me"
+    ];
+
+    const formattedStanzas = poemStanzas.map(stanza => `
+        <div style="page-break-inside: avoid; margin-bottom: 40px; font-family: 'Dancing Script', cursive; font-size: 28px; line-height: 1.6; color: #444;">
+            ${stanza}
+        </div>
+    `).join('');
+    
+    innerContent.innerHTML = `
+        <div style="font-family: 'Dancing Script', cursive; font-size: 48px; text-align: center; color: #ff4f8b; margin-top: 10px; margin-bottom: 10px; page-break-inside: avoid;">More than you love me</div>
+        <div style="text-align: right; font-family: 'Dancing Script', cursive; font-size: 32px; color: #ff4f8b; margin-bottom: 50px; page-break-inside: avoid;">Rishabh Chugh</div>
+        ${formattedStanzas}
     `;
 
+    pdfContent.appendChild(innerContent);
     wrapper.appendChild(pdfContent);
     document.body.appendChild(wrapper);
 
+    // ZERO margin forces the background to be completely edge-to-edge
     const opt = {
-        margin:       0.4, 
+        margin:       0, 
         filename:     'For_Shruti.pdf',
         image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'avoid-all'] } // This rule prevents the sliced words!
     };
 
     html2pdf().set(opt).from(pdfContent).save().then(() => {
