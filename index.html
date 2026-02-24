@@ -157,10 +157,11 @@ body {
 
 /* State 2: Expands and unfolds over the screen */
 .letter.unfold {
-    transform: translate(-50%, -50%) translateY(-6vh); /* Shifted up to center properly */
+    top: 45%; /* Shifted higher up the screen */
+    transform: translate(-50%, -50%); 
     width: 90vw;
     max-width: 420px;
-    height: 60vh; /* Reduced height to keep it completely clear of the buttons */
+    height: 65vh; 
     border-radius: 15px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
@@ -192,7 +193,7 @@ body {
 /* Action Buttons Group */
 .action-buttons {
     position: fixed;
-    bottom: 5vh; /* Pinned comfortably to the bottom of the screen */
+    bottom: 30px; /* Locked to the bottom of the screen */
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     display: flex;
@@ -239,11 +240,12 @@ body {
     .poem { font-size: 17px; }
     
     .letter.unfold { 
-        height: 58vh; /* Guaranteed to stay safely above the buttons */
-        transform: translate(-50%, -50%) translateY(-6vh); 
+        top: 40%; /* Pushed significantly higher on mobile */
+        height: 60vh; /* Shorter height so it doesn't touch the buttons */
+        transform: translate(-50%, -50%); 
     }
     
-    .action-buttons { bottom: 5vh; gap: 10px; }
+    .action-buttons { bottom: 25px; gap: 10px; }
     .action-btn { padding: 10px 15px; font-size: 14px; }
 }
 
@@ -407,51 +409,66 @@ downloadBtn.addEventListener('click', () => {
     wrapper.style.pointerEvents = 'none';
     wrapper.style.overflow = 'hidden'; 
     
-    // 1. Create a super container that is EXACTLY the height of 2 pages (1056px * 2 = 2112px)
-    // This forces the hearts to tile perfectly across both pages with NO white borders
     const pdfContent = document.createElement('div');
     pdfContent.style.width = '816px'; 
-    pdfContent.style.height = '2112px'; 
     pdfContent.style.backgroundColor = 'white';
-    pdfContent.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.08' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`;
-    pdfContent.style.backgroundSize = '40px 40px';
     
-    // 2. We explicitly code Page 1 and Page 2 as exact blocks so text NEVER crosses the page break line
-    pdfContent.innerHTML = `
-        <div style="height: 1056px; padding: 100px 80px; box-sizing: border-box;">
-            <div style="font-family: 'Dancing Script', cursive; font-size: 56px; text-align: center; color: #ff4f8b; margin-bottom: 20px;">More than you love me</div>
-            <div style="text-align: right; font-family: 'Dancing Script', cursive; font-size: 36px; color: #ff4f8b; margin-bottom: 60px;">Rishabh Chugh</div>
-            <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 40px;">
-                I don’t know when it happened.<br>Maybe somewhere between your laugh<br>And the way you say my name,<br>You became my favorite thought.
-            </div>
-            <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 40px;">
-                You’re my peace in a storm,<br>The softness in my sharp edges,<br>Your touch makes my heart go warm,<br>You reshaped my whole world with the softest sketches
-            </div>
-            <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444;">
-                From taking off your earrings,<br>To soft kisses on your neck,<br>You are the answer to all my yearnings,<br>The answer to my prayers, one I’d never expect
-            </div>
+    const heartBackground = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.08' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`;
+    
+    // PAGE 1 (Explicitly forcing an 8.5 x 11 inch box)
+    const page1 = document.createElement('div');
+    page1.style.width = '816px';
+    page1.style.height = '1056px';
+    page1.style.padding = '100px 80px';
+    page1.style.boxSizing = 'border-box';
+    page1.style.backgroundImage = heartBackground;
+    page1.style.backgroundSize = '40px 40px';
+    page1.style.pageBreakAfter = 'always'; // Forces the PDF to cut to a new page here
+    
+    page1.innerHTML = `
+        <div style="font-family: 'Dancing Script', cursive; font-size: 56px; text-align: center; color: #ff4f8b; margin-bottom: 20px;">More than you love me</div>
+        <div style="text-align: right; font-family: 'Dancing Script', cursive; font-size: 36px; color: #ff4f8b; margin-bottom: 60px;">Rishabh Chugh</div>
+        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 40px;">
+            I don’t know when it happened.<br>Maybe somewhere between your laugh<br>And the way you say my name,<br>You became my favorite thought.
         </div>
-        
-        <div style="height: 1056px; padding: 100px 80px; box-sizing: border-box;">
-            <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 50px;">
-                But baby, one thing I wanna say to you,<br>The three magic words that make me<br>The happiest man on earth, my boo,<br>You’re my every fantasy,<br>All I wanna say to you,<br>I love you, I love you, I love you,<br>But more than you love me
-            </div>
-            <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444;">
-                And now that you know I do,<br>I guess theres just one thing left to do,<br>Write you a poem you can brag about,<br>To your friends and peers, as I brag about you,<br>But I will still say this baby,<br>I love you, I love you, I love you,<br>But more than you love me
-            </div>
+        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 40px;">
+            You’re my peace in a storm,<br>The softness in my sharp edges,<br>Your touch makes my heart go warm,<br>You reshaped my whole world with the softest sketches
+        </div>
+        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444;">
+            From taking off your earrings,<br>To soft kisses on your neck,<br>You are the answer to all my yearnings,<br>The answer to my prayers, one I’d never expect
         </div>
     `;
 
+    // PAGE 2 (A second perfect 8.5 x 11 inch box)
+    const page2 = document.createElement('div');
+    page2.style.width = '816px';
+    page2.style.height = '1056px';
+    page2.style.padding = '100px 80px';
+    page2.style.boxSizing = 'border-box';
+    page2.style.backgroundImage = heartBackground;
+    page2.style.backgroundSize = '40px 40px';
+    
+    page2.innerHTML = `
+        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 50px;">
+            But baby, one thing I wanna say to you,<br>The three magic words that make me<br>The happiest man on earth, my boo,<br>You’re my every fantasy,<br>All I wanna say to you,<br>I love you, I love you, I love you,<br>But more than you love me
+        </div>
+        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444;">
+            And now that you know I do,<br>I guess theres just one thing left to do,<br>Write you a poem you can brag about,<br>To your friends and peers, as I brag about you,<br>But I will still say this baby,<br>I love you, I love you, I love you,<br>But more than you love me
+        </div>
+    `;
+
+    pdfContent.appendChild(page1);
+    pdfContent.appendChild(page2);
     wrapper.appendChild(pdfContent);
     document.body.appendChild(wrapper);
 
-    // Margins are ZERO so the background spans edge-to-edge seamlessly 
     const opt = {
         margin:       0, 
         filename:     'For_Shruti.pdf',
         image:        { type: 'jpeg', quality: 1 },
         html2canvas:  { scale: 2, useCORS: true, windowWidth: 816 },
-        jsPDF:        { unit: 'px', format: [816, 1056], orientation: 'portrait' }
+        jsPDF:        { unit: 'px', format: [816, 1056], orientation: 'portrait' },
+        pagebreak:    { mode: 'css' } // Uses the forced page breaks we applied above
     };
 
     html2pdf().set(opt).from(pdfContent).save().then(() => {
