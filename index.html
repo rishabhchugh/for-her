@@ -157,8 +157,7 @@ body {
 
 /* State 2: Expands and unfolds over the screen */
 .letter.unfold {
-    top: 45%; /* Shifted higher up the screen */
-    transform: translate(-50%, -50%); 
+    transform: translate(-50%, -50%) translateY(-5vh); 
     width: 90vw;
     max-width: 420px;
     height: 65vh; 
@@ -193,7 +192,7 @@ body {
 /* Action Buttons Group */
 .action-buttons {
     position: fixed;
-    bottom: 30px; /* Locked to the bottom of the screen */
+    bottom: 6vh; 
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     display: flex;
@@ -240,12 +239,11 @@ body {
     .poem { font-size: 17px; }
     
     .letter.unfold { 
-        top: 40%; /* Pushed significantly higher on mobile */
-        height: 60vh; /* Shorter height so it doesn't touch the buttons */
-        transform: translate(-50%, -50%); 
+        height: 55vh; 
+        transform: translate(-50%, -50%) translateY(-5vh);
     }
     
-    .action-buttons { bottom: 25px; gap: 10px; }
+    .action-buttons { bottom: 8vh; gap: 10px; }
     .action-btn { padding: 10px 15px; font-size: 14px; }
 }
 
@@ -334,7 +332,6 @@ const actionButtons = document.getElementById("action-buttons");
 const resetBtn = document.getElementById("reset-btn");
 const downloadBtn = document.getElementById("download-btn");
 
-// Forward Animation (Opening the letter)
 card.addEventListener('click', () => {
     if(isAnimating) return; 
 
@@ -364,7 +361,6 @@ card.addEventListener('click', () => {
     }
 });
 
-// Rewind Animation (Resetting the letter)
 resetBtn.addEventListener('click', () => {
     if(isAnimating) return;
     isAnimating = true;
@@ -394,85 +390,53 @@ resetBtn.addEventListener('click', () => {
     }, 2300);
 });
 
-// Download PDF Logic
+// --- FINAL FIXED PDF LOGIC ---
 downloadBtn.addEventListener('click', () => {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = "Saving... ⏳";
     
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'fixed';
-    wrapper.style.top = '0';
-    wrapper.style.left = '0';
-    wrapper.style.width = '100vw';
-    wrapper.style.height = '100vh';
-    wrapper.style.zIndex = '1'; 
-    wrapper.style.pointerEvents = 'none';
-    wrapper.style.overflow = 'hidden'; 
-    
-    const pdfContent = document.createElement('div');
-    pdfContent.style.width = '816px'; 
-    pdfContent.style.backgroundColor = 'white';
-    
-    const heartBackground = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.08' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`;
-    
-    // PAGE 1 (Explicitly forcing an 8.5 x 11 inch box)
-    const page1 = document.createElement('div');
-    page1.style.width = '816px';
-    page1.style.height = '1056px';
-    page1.style.padding = '100px 80px';
-    page1.style.boxSizing = 'border-box';
-    page1.style.backgroundImage = heartBackground;
-    page1.style.backgroundSize = '40px 40px';
-    page1.style.pageBreakAfter = 'always'; // Forces the PDF to cut to a new page here
-    
-    page1.innerHTML = `
-        <div style="font-family: 'Dancing Script', cursive; font-size: 56px; text-align: center; color: #ff4f8b; margin-bottom: 20px;">More than you love me</div>
-        <div style="text-align: right; font-family: 'Dancing Script', cursive; font-size: 36px; color: #ff4f8b; margin-bottom: 60px;">Rishabh Chugh</div>
-        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 40px;">
-            I don’t know when it happened.<br>Maybe somewhere between your laugh<br>And the way you say my name,<br>You became my favorite thought.
-        </div>
-        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 40px;">
-            You’re my peace in a storm,<br>The softness in my sharp edges,<br>Your touch makes my heart go warm,<br>You reshaped my whole world with the softest sketches
-        </div>
-        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444;">
-            From taking off your earrings,<br>To soft kisses on your neck,<br>You are the answer to all my yearnings,<br>The answer to my prayers, one I’d never expect
+    // We build a temporary container that isn't hidden by "overflow:hidden"
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    document.body.appendChild(tempContainer);
+
+    const heartSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4f8b' opacity='0.08' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E";
+
+    // Creating a dedicated PDF element with the font and background explicitly set
+    const pdfElement = document.createElement('div');
+    pdfElement.style.width = '800px';
+    pdfElement.style.backgroundColor = 'white';
+    pdfContent = `
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&display=swap');
+            .pdf-body {
+                padding: 80px;
+                background-image: url("${heartSvg}");
+                background-size: 40px 40px;
+                font-family: 'Dancing Script', cursive;
+            }
+        </style>
+        <div class="pdf-body">
+            <div style="font-size: 48px; text-align: center; color: #ff4f8b; margin-bottom: 10px;">More than you love me</div>
+            <div style="text-align: right; font-size: 28px; color: #ff4f8b; margin-bottom: 40px;">Rishabh Chugh</div>
+            <div style="font-size: 24px; line-height: 1.6; color: #444; white-space: pre-line;">${document.querySelector('.poem').innerText}</div>
         </div>
     `;
-
-    // PAGE 2 (A second perfect 8.5 x 11 inch box)
-    const page2 = document.createElement('div');
-    page2.style.width = '816px';
-    page2.style.height = '1056px';
-    page2.style.padding = '100px 80px';
-    page2.style.boxSizing = 'border-box';
-    page2.style.backgroundImage = heartBackground;
-    page2.style.backgroundSize = '40px 40px';
-    
-    page2.innerHTML = `
-        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444; margin-bottom: 50px;">
-            But baby, one thing I wanna say to you,<br>The three magic words that make me<br>The happiest man on earth, my boo,<br>You’re my every fantasy,<br>All I wanna say to you,<br>I love you, I love you, I love you,<br>But more than you love me
-        </div>
-        <div style="font-family: 'Dancing Script', cursive; font-size: 32px; line-height: 1.6; color: #444;">
-            And now that you know I do,<br>I guess theres just one thing left to do,<br>Write you a poem you can brag about,<br>To your friends and peers, as I brag about you,<br>But I will still say this baby,<br>I love you, I love you, I love you,<br>But more than you love me
-        </div>
-    `;
-
-    pdfContent.appendChild(page1);
-    pdfContent.appendChild(page2);
-    wrapper.appendChild(pdfContent);
-    document.body.appendChild(wrapper);
+    pdfElement.innerHTML = pdfContent;
+    tempContainer.appendChild(pdfElement);
 
     const opt = {
-        margin:       0, 
+        margin:       0,
         filename:     'For_Shruti.pdf',
         image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 816 },
-        jsPDF:        { unit: 'px', format: [816, 1056], orientation: 'portrait' },
-        pagebreak:    { mode: 'css' } // Uses the forced page breaks we applied above
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'px', format: [800, pdfElement.offsetHeight], orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(pdfContent).save().then(() => {
-        document.body.removeChild(wrapper);
+    html2pdf().set(opt).from(pdfElement).save().then(() => {
+        document.body.removeChild(tempContainer);
         downloadBtn.innerHTML = originalText;
     });
 });
